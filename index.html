@@ -2871,58 +2871,19 @@ async function sbDelete(table,id){
 // ══════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════
-function showPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  const el=document.getElementById('page-'+page);
-  if(el)el.classList.add('active');
-  const navSelector = '.nav-item[onclick*="' + page + '"]';
-  const nav = document.querySelector(navSelector);
-  if(nav)nav.classList.add('active');
-  STATE.currentPage=page;
-  if(page==='pipeline')renderPipeline();
-  if(page==='tasks')renderTasksPage();
-  if(page==='sms')renderSMS();
-  if(page==='calls')renderCalls();
-  if(page==='contributions')renderContribs();
-  if(page==='overview')renderOverview();
-}
 
-function openOverlay(id){const el=document.getElementById(id);if(el){el.style.display='flex';document.body.style.overflow='hidden';}}
-function closeOverlay(id){const el=document.getElementById(id);if(el){el.style.display='none';document.body.style.overflow='';}}
-
-// ══════════════════════════════════
-// INIT
-// ══════════════════════════════════
 async function init(){
-  // Load config
-  if(typeof SUPABASE_URL!=='undefined'&&SUPABASE_URL&&!SUPABASE_URL.includes('YOUR_')){
-    try{
-      supabase=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
-      if(supabase){
-        document.getElementById('configBanner').style.display='none';
-        supabase.channel('wos').
-          on('postgres_changes',{event:'*',schema:'public',table:'calls'},()=>loadCalls()).
-          on('postgres_changes',{event:'*',schema:'public',table:'sms_daily'},()=>loadSMS()).
-          on('postgres_changes',{event:'*',schema:'public',table:'deals'},()=>loadDeals()).
-          on('postgres_changes',{event:'*',schema:'public',table:'contributions'},()=>loadContribs()).
-          on('postgres_changes',{event:'*',schema:'public',table:'leads'},()=>loadLeads()).
-          on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks()).
-          subscribe();
-      }
-    }catch(e){console.error('Supabase init error',e);}
-  }
-  // Load from localStorage
+  // Restore saved local data first so UI isn't blank
   const saved=localStorage.getItem('wos_db');
   if(saved){try{const d=JSON.parse(saved);DB.leads=d.leads||[];DB.calls=d.calls||[];DB.sms=d.sms||[];DB.tasks=d.tasks||[];DB.contributions=d.contributions||[];DB.deals=d.deals||[];}catch(e){}}
-  // rep selector removed — each modal handles its own rep
-  // Restore sidebar rep selection
+  // Restore rep
   const savedRep=localStorage.getItem('wos_rep')||localStorage.getItem('wos_last_rep')||'';
   if(savedRep){STATE.rep=savedRep;LC.rep=savedRep;document.querySelectorAll('.sidebar-rep-btn').forEach(b=>b.classList.toggle('srep-active',b.dataset.rep===savedRep));}
   showPage('overview');
   restoreRepFilters();
+  // Connect to Supabase and load live data
+  await initSB();
   await loadAll();
-  document.getElementById('dashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 }
 
 document.addEventListener('DOMContentLoaded',init);
