@@ -386,6 +386,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
 .verse-text{font-size:13px;color:var(--text);line-height:1.65;font-style:italic;margin-bottom:5px}
 .verse-ref{font-family:var(--mono);font-size:10px;color:var(--accent);opacity:0.8;font-style:normal;letter-spacing:0.05em}
 
+/* ── LEAD MODAL TABS ── */
+.lead-tab{padding:10px 16px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.12s;white-space:nowrap}
+.lead-tab:hover{color:var(--text)}
+.lead-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.uw-section-title{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.uw-result-box{background:rgba(25,29,51,0.6);border:1px solid var(--border2);border-radius:var(--r2);padding:14px 18px;margin-top:14px}
+.uw-result-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.uw-result-row:last-child{border-bottom:none;padding-top:10px;margin-top:4px}
+.uw-result-label{color:var(--text2)}
+.uw-result-val{font-family:var(--mono);font-weight:600;color:var(--text)}
+.uw-result-total{font-size:15px;color:var(--accent)}
+.uw-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-size:10px;font-weight:600}
+.uw-done{background:rgba(82,217,138,0.12);color:var(--green);border:1px solid rgba(82,217,138,0.2)}
+.uw-pending{background:rgba(244,163,74,0.12);color:var(--accent);border:1px solid rgba(244,163,74,0.2)}
+.uw-none{background:rgba(255,255,255,0.04);color:var(--text3);border:1px solid var(--border)}
+
+.spread-result{background:rgba(25,29,51,0.7);border:1px solid var(--border2);border-radius:var(--r2);padding:12px 16px;margin-top:10px}
+.spread-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:12px;border-bottom:1px solid var(--border)}
+.spread-row:last-child{border-bottom:none;padding-top:8px;margin-top:4px}
+.spread-label{color:var(--text2)}
+.spread-val{font-family:var(--mono);font-weight:600}
+.spread-fee{font-size:15px;color:var(--green)}
+.uw-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-family:var(--mono);font-size:9px;font-weight:600}
+.uw-done{background:rgba(82,217,138,0.12);color:var(--green);border:1px solid rgba(82,217,138,0.2)}
+.uw-none{background:rgba(255,255,255,0.04);color:var(--text3);border:1px solid var(--border)}
 /* ── DASHBOARD SECTION LABELS ── */
 .dash-section-label{font-family:var(--mono);font-size:9px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:0.16em;margin-bottom:14px;display:flex;align-items:center;gap:12px;opacity:0.8}
 .dash-section-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
@@ -692,6 +717,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="ph-sub" id="pipelineSub"></div>
     </div>
     <div class="ph-actions">
+      <select class="form-select" id="pipelineRepFilter" style="width:120px;font-size:11px;padding:6px 10px" onchange="setPipelineRepFilter(this.value)">
+        <option value="">All Reps</option>
+        <option value="Ivan">Ivan</option>
+        <option value="Dustin">Dustin</option>
+        <option value="Alan">Alan</option>
+        <option value="Uriel">Uriel</option>
+      </select>
       <button class="btn btn-ghost btn-sm" onclick="openStageManager()">⚙ Manage Stages</button>
       <button class="btn btn-primary" onclick="openLeadModal()">+ Add Lead</button>
     </div>
@@ -720,6 +752,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
         <option value="in_progress">In Progress</option>
         <option value="overdue">Overdue</option>
         <option value="completed">Completed</option>
+      </select>
+      <select class="form-select" id="taskRepFilter" style="width:120px;font-size:11px;padding:6px 10px" onchange="setTaskRepFilter(this.value)">
+        <option value="">All Reps</option>
+        <option value="Ivan">Ivan</option>
+        <option value="Dustin">Dustin</option>
+        <option value="Alan">Alan</option>
+        <option value="Uriel">Uriel</option>
       </select>
       <button class="btn btn-primary" onclick="openTaskModal()">+ Add Task</button>
     </div>
@@ -938,17 +977,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
       <div class="form-group"><label class="form-label">City</label><input class="form-input" id="lf-city"></div>
       <div class="form-group"><label class="form-label">State / Zip</label><div style="display:flex;gap:6px"><input class="form-input" id="lf-state" placeholder="TX" style="width:55px"><input class="form-input" id="lf-zip" placeholder="Zip" style="flex:1"></div></div>
       <div class="form-group"><label class="form-label">Deal Type</label>
-        <select class="form-select" id="lf-type" onchange="updateStatusOpts(this.value)">
+        <select class="form-select" id="lf-type" onchange="updateStatusOpts(this.value);updateSpreadFields(this.value)">
           <option value="">Select...</option>
           <option>Novation</option><option>Cash / Wholesale</option><option>Subject-To</option><option>Seller Finance</option><option>Hybrid</option>
         </select>
       </div>
-      <div class="form-group"><label class="form-label">Status</label><select class="form-select" id="lf-status"><option>Select deal type first...</option></select></div>
-      <div class="form-group"><label class="form-label">Lead Priority</label>
+      <div class="form-group"><label class="form-label">Stage</label><select class="form-select" id="lf-status"><option>Select deal type first...</option></select></div>
+      <div class="form-group"><label class="form-label">Underwriting</label>
+        <select class="form-select" id="lf-uw">
+          <option value="">Needs Underwriting</option>
+          <option value="Complete">✓ Underwritten</option>
+          <option value="N/A">N/A</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Assigned Rep</label>
+        <select class="form-select" id="lf-rep"><option value="">Unassigned</option><option>Ivan</option><option>Dustin</option><option>Alan</option><option>Uriel</option></select>
+      </div>
+      <div class="form-group"><label class="form-label">Priority</label>
         <select class="form-select" id="lf-priority">
           <option value="hot">🔥 Hot</option><option value="warm">⚡ Warm</option>
-          <option value="cold">❄️ Cold</option><option value="nurture">💤 Nurture</option><option value="mia">👻 MIA</option>
+          <option value="nurture">💤 Nurture</option><option value="mia">👻 MIA</option><option value="cold">❄️ Cold</option>
         </select>
+      </div>
+      <div class="form-group"><label class="form-label">Follow-up Date</label><input type="date" class="form-input" id="lf-followup"></div>
+      <div class="form-group"><label class="form-label">Lead Source</label>
+        <select class="form-select" id="lf-src"><option>SMS</option><option>JV</option><option>Direct Mail</option><option>Referral</option><option>Cold Call</option><option>Other</option></select>
       </div>
       <div class="form-group"><label class="form-label">Category</label>
         <select class="form-select" id="lf-cat">
@@ -957,19 +1010,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13
           <option>JV / Wholesaler</option><option>Referral</option>
         </select>
       </div>
-      <div class="form-group"><label class="form-label">Assigned Rep</label>
-        <select class="form-select" id="lf-rep"><option value="">Unassigned</option><option>Ivan</option><option>Dustin</option><option>Alan</option><option>Uriel</option></select>
+
+      <!-- Spread calculator -->
+      <div class="form-full" id="spread-section" style="display:none">
+        <div style="height:1px;background:var(--border);margin:4px 0 14px"></div>
+        <div id="nov-spread" style="display:none">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Novation Spread Calculator</div>
+          <div class="form-grid fg-2" style="margin-bottom:0">
+            <div class="form-group"><label class="form-label">Back-End List Price ($)</label><input type="number" class="form-input" id="lf-list-price" placeholder="As-is list price" oninput="calcSpread()"></div>
+            <div class="form-group"><label class="form-label">Contract Price to Seller ($)</label><input type="number" class="form-input" id="lf-contract-nov" placeholder="What seller signs for" oninput="calcSpread()"></div>
+          </div>
+          <div class="spread-result" id="nov-spread-result" style="display:none"></div>
+        </div>
+        <div id="cash-spread" style="display:none">
+          <div style="font-family:var(--mono);font-size:9px;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">Cash / Wholesale Spread Calculator</div>
+          <div class="form-grid fg-2" style="margin-bottom:0">
+            <div class="form-group"><label class="form-label">Contract Price with Seller ($)</label><input type="number" class="form-input" id="lf-cprice" placeholder="What you bought it for" oninput="calcSpread()"></div>
+            <div class="form-group"><label class="form-label">Assignment Price ($)</label><input type="number" class="form-input" id="lf-aprice" placeholder="What you are selling it for" oninput="calcSpread()"></div>
+          </div>
+          <div class="spread-result" id="cash-spread-result" style="display:none"></div>
+        </div>
       </div>
-      <div class="form-group"><label class="form-label">Lead Source</label>
-        <select class="form-select" id="lf-src"><option>SMS</option><option>JV</option><option>Direct Mail</option><option>Referral</option><option>Cold Call</option><option>Other</option></select>
-      </div>
-      <div class="form-group"><label class="form-label">Follow-up Date</label><input type="date" class="form-input" id="lf-followup"></div>
-      <div class="form-group"><label class="form-label">Contract Price ($)</label><input type="number" class="form-input" id="lf-cprice" placeholder="0"></div>
-      <div class="form-group"><label class="form-label">Assigned Price ($)</label><input type="number" class="form-input" id="lf-aprice" placeholder="0"></div>
-      <div class="form-group"><label class="form-label">Underwriting</label>
-        <select class="form-select" id="lf-uw"><option value="">Not started</option><option>Pending</option><option>In Review</option><option>Complete</option><option>N/A</option></select>
-      </div>
-      <div class="form-group form-full"><label class="form-label">Notes / Why Hot</label><textarea class="form-textarea" id="lf-notes" placeholder="Why is this lead hot? Key details, situation..."></textarea></div>
+
+      <div class="form-group form-full"><label class="form-label">Notes</label><textarea class="form-textarea" id="lf-notes" placeholder="Situation, motivation, underwriting notes..."></textarea></div>
     </div>
   </div>
   <div class="modal-footer">
@@ -1181,16 +1244,114 @@ let currentDealId = null;
 // STATUS MAP
 // ═══════════════════════════════════════════════════
 const STATUS_MAP = {
-  'Novation':['Novation — Initial Contact','Novation — Need Underwriting','Novation — Awaiting Listing Docs','Novation — Awaiting Seller Signature','Novation — Ready for Market','Novation — On Market','Novation — Offer Received','Novation — Under Contract','Novation — Sold / Closed','Novation — Dead Deal'],
-  'Cash / Wholesale':['Cash — Initial Contact','Cash — Running Numbers','Cash — Offer Submitted','Cash — Offer Accepted','Cash — Under Contract','Cash — Due Diligence','Cash — Buyer Found','Cash — Assigned','Cash — Closed','Cash — Dead Deal'],
-  'Subject-To':['Sub-To — Initial Contact','Sub-To — Analyzing Mortgage','Sub-To — Structuring Terms','Sub-To — Awaiting Seller Docs','Sub-To — Under Agreement','Sub-To — Title Review','Sub-To — Closed','Sub-To — Dead Deal'],
-  'Seller Finance':['Seller Finance — Initial Contact','Seller Finance — Negotiating Terms','Seller Finance — Term Sheet Sent','Seller Finance — Under Agreement','Seller Finance — Title / Closing','Seller Finance — Closed','Seller Finance — Dead Deal'],
-  'Hybrid':['Hybrid — Evaluating Options','Hybrid — Strategy Selected','Hybrid — In Negotiation','Hybrid — Under Agreement','Hybrid — Closing','Hybrid — Dead Deal'],
-  '':['New Lead','Contacted','Negotiating','Offer Sent','Under Agreement','Closed','Dead Deal']
+  'Novation': ['Initial Contact','Need Underwriting','Offer Submitted','Offer Accepted','Awaiting Seller Signature','Under Agreement','On Market','Offer Received','Active Under Contract — Dispo','Closed','Dead Deal'],
+  'Cash / Wholesale': ['Initial Contact','Running Numbers','Offer Submitted','Offer Accepted','Active Under Contract — Dispo','Buyer Found','Assigned','Closed','Dead Deal'],
+  'Subject-To': ['Initial Contact','Analyzing Mortgage','Structuring Terms','Awaiting Seller Docs','Under Agreement','Title Review','Closed','Dead Deal'],
+  'Seller Finance': ['Initial Contact','Running Numbers','Terms Submitted','Under Agreement','Closed','Dead Deal'],
+  'Hybrid': ['Initial Contact','Need Underwriting','Offer Submitted','Under Agreement','Active Under Contract — Dispo','Closed','Dead Deal'],
+  '': ['Initial Contact','Need Underwriting','Offer Submitted','Under Agreement','Closed','Dead Deal']
 };
+function updateSpreadFields(type) {
+  const section = document.getElementById('spread-section');
+  const novDiv = document.getElementById('nov-spread');
+  const cashDiv = document.getElementById('cash-spread');
+  if(!section) return;
+  if(type === 'Novation') { section.style.display='block'; novDiv.style.display='block'; cashDiv.style.display='none'; }
+  else if(type === 'Cash / Wholesale') { section.style.display='block'; novDiv.style.display='none'; cashDiv.style.display='block'; }
+  else { section.style.display='none'; }
+  calcSpread();
+}
+
+function calcSpread() {
+  const type = document.getElementById('lf-type') ? document.getElementById('lf-type').value : '';
+  if(type === 'Novation') {
+    const lp = parseFloat(document.getElementById('lf-list-price') ? document.getElementById('lf-list-price').value : '') || 0;
+    const cn = parseFloat(document.getElementById('lf-contract-nov') ? document.getElementById('lf-contract-nov').value : '') || 0;
+    const net = lp * 0.90;
+    const spread = net - cn;
+    const el = document.getElementById('nov-spread-result');
+    if(!el) return;
+    if(!lp && !cn) { el.style.display='none'; return; }
+    el.style.display='block';
+    el.innerHTML = '<div class="spread-row"><span class="spread-label">Back-End List Price</span><span class="spread-val">' + fmt$(lp) + '</span></div>'
+      + '<div class="spread-row"><span class="spread-label">Net List (minus 10%)</span><span class="spread-val">' + fmt$(net) + '</span></div>'
+      + '<div class="spread-row"><span class="spread-label">Contract Price to Seller</span><span class="spread-val">- ' + fmt$(cn) + '</span></div>'
+      + '<div class="spread-row"><span class="spread-label" style="font-weight:700;color:var(--text)">Our Spread / Fee</span><span class="spread-val spread-fee">' + fmt$(spread) + '</span></div>';
+  }
+  if(type === 'Cash / Wholesale') {
+    const cp = parseFloat(document.getElementById('lf-cprice') ? document.getElementById('lf-cprice').value : '') || 0;
+    const ap = parseFloat(document.getElementById('lf-aprice') ? document.getElementById('lf-aprice').value : '') || 0;
+    const spread = ap - cp;
+    const el = document.getElementById('cash-spread-result');
+    if(!el) return;
+    if(!cp && !ap) { el.style.display='none'; return; }
+    el.style.display='block';
+    el.innerHTML = '<div class="spread-row"><span class="spread-label">Contract Price with Seller</span><span class="spread-val">' + fmt$(cp) + '</span></div>'
+      + '<div class="spread-row"><span class="spread-label">Assignment Price</span><span class="spread-val">' + fmt$(ap) + '</span></div>'
+      + '<div class="spread-row"><span class="spread-label" style="font-weight:700;color:var(--text)">Our Spread / Fee</span><span class="spread-val spread-fee">' + fmt$(spread) + '</span></div>';
+  }
+}
+
 function updateStatusOpts(type, cur) {
   const s = document.getElementById('lf-status');
   s.innerHTML = (STATUS_MAP[type]||STATUS_MAP['']).map(o=>`<option value="${o}"${o===cur?' selected':''}>${o}</option>`).join('');
+}
+
+// ── LEAD MODAL TABS ──
+function switchLeadTab(tab) {
+  ['info','uw'].forEach(t => {
+    document.getElementById('ltab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('ltab-' + t + '-body').style.display = t === tab ? 'block' : 'none';
+  });
+}
+
+function updateUWFields(type) {
+  const show = id => { const el = document.getElementById(id); if(el) el.style.display = 'block'; };
+  const hide = id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; };
+  ['uw-cash','uw-nov','uw-other','uw-none'].forEach(hide);
+  if(!type) { show('uw-none'); return; }
+  if(type === 'Cash / Wholesale') show('uw-cash');
+  else if(type === 'Novation') show('uw-nov');
+  else if(type) show('uw-other');
+  // Recalc
+  if(type === 'Cash / Wholesale') calcCash();
+  if(type === 'Novation') calcNov();
+}
+
+function calcCash() {
+  const contract = parseFloat(document.getElementById('lf-cprice')?.value) || 0;
+  const goalAssign = parseFloat(document.getElementById('lf-goal-assign')?.value) || 0;
+  const actualAssign = parseFloat(document.getElementById('lf-aprice')?.value) || 0;
+  const arv = parseFloat(document.getElementById('lf-arv')?.value) || 0;
+  const repairs = parseFloat(document.getElementById('lf-repairs')?.value) || 0;
+  const maoPct = parseFloat(document.getElementById('lf-mao-pct')?.value) || 70;
+  const goalFee = goalAssign - contract;
+  const actualFee = actualAssign - contract;
+  const mao = arv > 0 ? (arv * maoPct / 100) - repairs : 0;
+  const el = document.getElementById('cash-result');
+  if(!el) return;
+  el.innerHTML = '<div class="uw-result-row"><span class="uw-result-label">Contract Price</span><span class="uw-result-val">' + fmt$(contract) + '</span></div>'
+    + '<div class="uw-result-row"><span class="uw-result-label">Goal Assignment Price</span><span class="uw-result-val">' + fmt$(goalAssign) + '</span></div>'
+    + (goalFee ? '<div class="uw-result-row"><span class="uw-result-label">Goal Assignment Fee</span><span class="uw-result-val" style="color:var(--accent)">' + fmt$(goalFee) + '</span></div>' : '')
+    + (actualAssign ? '<div class="uw-result-row"><span class="uw-result-label">Actual Assignment Price</span><span class="uw-result-val">' + fmt$(actualAssign) + '</span></div>' : '')
+    + (actualFee ? '<div class="uw-result-row"><span class="uw-result-label">Actual Assignment Fee</span><span class="uw-result-val" style="color:var(--green)">' + fmt$(actualFee) + '</span></div>' : '')
+    + (mao ? '<div class="uw-result-row"><span class="uw-result-label">Max Allowable Offer (' + maoPct + '% rule)</span><span class="uw-result-val" style="color:var(--blue)">' + fmt$(mao) + '</span></div>' : '');
+}
+
+function calcNov() {
+  const asIs = parseFloat(document.getElementById('lf-asIs')?.value) || 0;
+  const closingPct = parseFloat(document.getElementById('lf-closing-pct')?.value) || 10;
+  const repairs = parseFloat(document.getElementById('lf-nov-repairs')?.value) || 0;
+  const profitGoal = parseFloat(document.getElementById('lf-assignment-fee')?.value) || 0;
+  const closingAmt = asIs * (closingPct / 100);
+  const offer = asIs - closingAmt - repairs - profitGoal;
+  const el = document.getElementById('nov-result');
+  if(!el) return;
+  el.innerHTML = '<div class="uw-result-row"><span class="uw-result-label">As-Is Value</span><span class="uw-result-val">' + fmt$(asIs) + '</span></div>'
+    + '<div class="uw-result-row"><span class="uw-result-label">− Closing Costs &amp; Commissions (' + closingPct + '%)</span><span class="uw-result-val" style="color:var(--red)">− ' + fmt$(closingAmt) + '</span></div>'
+    + '<div class="uw-result-row"><span class="uw-result-label">− Repairs</span><span class="uw-result-val" style="color:var(--red)">− ' + fmt$(repairs) + '</span></div>'
+    + '<div class="uw-result-row"><span class="uw-result-label">− Profit Goal / Assignment Fee</span><span class="uw-result-val" style="color:var(--red)">− ' + fmt$(profitGoal) + '</span></div>'
+    + '<div class="uw-result-row"><span class="uw-result-label" style="font-weight:700;color:var(--text)">= Novation Offer to Seller</span><span class="uw-result-val uw-result-total">' + fmt$(offer) + '</span></div>';
 }
 
 // ═══════════════════════════════════════════════════
@@ -1398,6 +1559,32 @@ function showPage(n){
   renders[n]?.();
 }
 function setActiveRep(r){STATE.rep=r;localStorage.setItem('wos_rep',r)} // kept for compat
+
+// ── REP FILTERS — localStorage per device, doesn't affect other users ──
+function setTaskRepFilter(rep) {
+  STATE.taskRepFilter = rep;
+  localStorage.setItem('wos_task_rep_filter', rep);
+  renderTasksPage();
+}
+
+function setPipelineRepFilter(rep) {
+  STATE.pipelineRepFilter = rep;
+  localStorage.setItem('wos_pipeline_rep_filter', rep);
+  renderPipeline();
+}
+
+function restoreRepFilters() {
+  // Restore from localStorage on load
+  const taskRep = localStorage.getItem('wos_task_rep_filter') || '';
+  const pipelineRep = localStorage.getItem('wos_pipeline_rep_filter') || '';
+  STATE.taskRepFilter = taskRep;
+  STATE.pipelineRepFilter = pipelineRep;
+  // Set dropdowns
+  const tSel = document.getElementById('taskRepFilter');
+  if(tSel) tSel.value = taskRep;
+  const pSel = document.getElementById('pipelineRepFilter');
+  if(pSel) pSel.value = pipelineRep;
+}
 
 // ── SIDEBAR REP ──
 function setSidebarRep(btn) {
@@ -1667,9 +1854,14 @@ function renderOverview(){
 // PIPELINE
 // ═══════════════════════════════════════════════════
 function renderPipeline(){
-  const leads = DB.leads || [];
+  let leads = DB.leads || [];
+  // Apply rep filter (localStorage per device — doesn't affect other users)
+  if(STATE.pipelineRepFilter) leads = leads.filter(l => l.rep === STATE.pipelineRepFilter);
+  const pSel = document.getElementById('pipelineRepFilter');
+  if(pSel && pSel.value !== (STATE.pipelineRepFilter||'')) pSel.value = STATE.pipelineRepFilter || '';
   const sub = document.getElementById('pipelineSub');
-  if(sub) sub.textContent = leads.length + ' leads · ' + leads.filter(l=>l.priority==='hot').length + ' hot · ' + leads.filter(l=>l.priority==='contract'||(l.status||'').toLowerCase().includes('under contract')).length + ' under contract';
+  const filterLabel = STATE.pipelineRepFilter ? ' · ' + leads.length + ' shown for ' + STATE.pipelineRepFilter : '';
+  if(sub) sub.textContent = (DB.leads.length) + ' leads · ' + DB.leads.filter(l=>l.priority==='hot').length + ' hot · ' + DB.leads.filter(l=>l.priority==='contract'||(l.status||'').toLowerCase().includes('under contract')).length + ' under contract' + filterLabel;
   renderBoard(leads);
 }
 
@@ -1744,13 +1936,20 @@ function renderBoard(leads) {
     // Build card HTML using a function to avoid nested template literal issues
     function miniCardHTML(l) {
       const priClass = {hot:'mc-hot',warm:'mc-warm',contract:'mc-contract',nurture:'mc-nurture',mia:'mc-mia'}[l.priority]||'';
+      const uwDone = l.underwriting==='Complete';
+      const uwBadge = uwDone ? '<span class="uw-badge uw-done">✓ UW</span>' : '<span class="uw-badge uw-none">UW?</span>';
+      const fee = l.assignment_fee ? '<span style="font-family:var(--mono);font-size:10px;color:var(--green);font-weight:700">' + fmt$(l.assignment_fee) + '</span>' : '';
       return '<div class="mini-card ' + priClass + '" draggable="true" data-leadid="' + l.id + '" onclick="openDealView(\'' + l.id + '\')">'
-        + '<div class="mini-name" style="font-size:12px;font-weight:600;margin-bottom:2px">' + (l.name||'—') + '</div>'
-        + '<div class="mini-addr" style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:6px">' + (l.address||'') + (l.city?', '+l.city:'') + '</div>'
-        + '<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">'
-        + dealTypeBadge(l.deal_type) + repChip(l.rep)
-        + '</div></div>';
+        + '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:3px">'
+        + '<div style="font-size:12px;font-weight:600;color:var(--text)">' + (l.name||'—') + '</div>'
+        + uwBadge + '</div>'
+        + '<div style="font-family:var(--mono);font-size:9px;color:var(--text3);margin-bottom:6px">'
+        + (l.address||'') + (l.city ? ', ' + l.city : '') + (l.phone ? ' · ' + l.phone : '') + '</div>'
+        + '<div style="display:flex;justify-content:space-between;align-items:center">'
+        + '<div style="display:flex;gap:4px">' + dealTypeBadge(l.deal_type) + repChip(l.rep) + '</div>'
+        + fee + '</div></div>';
     }
+
     const emptyMsg = '<div style="font-size:9px;color:var(--text3);text-align:center;padding:14px;font-family:var(--mono)">empty</div>';
 
     col.innerHTML = '<div class="board-col-hd" draggable="true" data-colidx="' + colIdx + '">'
@@ -1989,7 +2188,15 @@ function renderTaskCard(t){
 }
 
 function renderTasksPage(){
-  const tasks=STATE.taskFilter?DB.tasks.filter(t=>{if(STATE.taskFilter==='overdue')return isOverdue(t.due_date)&&t.status!=='completed';return t.status===STATE.taskFilter;}):DB.tasks;
+  let tasks = STATE.taskFilter ? DB.tasks.filter(t=>{
+    if(STATE.taskFilter==='overdue') return isOverdue(t.due_date)&&t.status!=='completed';
+    return t.status===STATE.taskFilter;
+  }) : DB.tasks;
+  // Apply rep filter (localStorage per device)
+  if(STATE.taskRepFilter) tasks = tasks.filter(t => t.rep === STATE.taskRepFilter || t.rep === '' && STATE.taskRepFilter === 'unassigned');
+  // Keep filter dropdown in sync
+  const tSel = document.getElementById('taskRepFilter');
+  if(tSel && tSel.value !== (STATE.taskRepFilter||'')) tSel.value = STATE.taskRepFilter || '';
   document.getElementById('t-overdue').textContent=DB.tasks.filter(t=>isOverdue(t.due_date)&&t.status!=='completed').length;
   document.getElementById('t-today').textContent=DB.tasks.filter(t=>isToday(t.due_date)&&t.status!=='completed').length;
   document.getElementById('t-pending').textContent=DB.tasks.filter(t=>t.status==='pending').length;
@@ -2552,35 +2759,79 @@ function renderContribs(){
 // MODAL ACTIONS
 // ═══════════════════════════════════════════════════
 function openLeadModal(id){
-  STATE.editLeadId=id||null;
-  document.getElementById('leadModalTitle').textContent=id?'Edit Lead':'Add Lead';
-  document.getElementById('delLeadBtn').style.display=id?'inline-flex':'none';
+  STATE.editLeadId = id||null;
+  document.getElementById('leadModalTitle').textContent = id ? 'Edit Lead' : 'Add Lead';
+  document.getElementById('delLeadBtn').style.display = id ? 'inline-flex' : 'none';
   if(id){
-    const l=DB.leads.find(x=>x.id===id);if(!l)return;
-    document.getElementById('lf-name').value=l.name||'';document.getElementById('lf-phone').value=l.phone||'';document.getElementById('lf-address').value=l.address||'';document.getElementById('lf-city').value=l.city||'';document.getElementById('lf-state').value=l.state||'TX';document.getElementById('lf-zip').value=l.zip||'';
-    document.getElementById('lf-type').value=l.deal_type||'';updateStatusOpts(l.deal_type||'',l.status);
-    document.getElementById('lf-priority').value=l.priority||'hot';document.getElementById('lf-cat').value=l.category||'Motivated Seller';document.getElementById('lf-rep').value=l.rep||'';document.getElementById('lf-src').value=l.lead_source||'SMS';document.getElementById('lf-followup').value=l.follow_up_date||'';document.getElementById('lf-cprice').value=l.contract_price||'';document.getElementById('lf-aprice').value=l.assigned_price||'';document.getElementById('lf-uw').value=l.underwriting||'';document.getElementById('lf-notes').value=l.notes||'';
+    const l = DB.leads.find(x=>x.id===id); if(!l) return;
+    document.getElementById('lf-name').value = l.name||'';
+    document.getElementById('lf-phone').value = l.phone||'';
+    document.getElementById('lf-address').value = l.address||'';
+    document.getElementById('lf-city').value = l.city||'';
+    document.getElementById('lf-state').value = l.state||'TX';
+    document.getElementById('lf-zip').value = l.zip||'';
+    document.getElementById('lf-type').value = l.deal_type||'';
+    updateStatusOpts(l.deal_type||'', l.status);
+    updateSpreadFields(l.deal_type||'');
+    document.getElementById('lf-priority').value = l.priority||'warm';
+    document.getElementById('lf-cat').value = l.category||'Motivated Seller';
+    document.getElementById('lf-rep').value = l.rep||'';
+    document.getElementById('lf-src').value = l.lead_source||'SMS';
+    document.getElementById('lf-followup').value = l.follow_up_date||'';
+    document.getElementById('lf-uw').value = l.underwriting||'';
+    document.getElementById('lf-notes').value = l.notes||'';
+    const uw = l.uw_data||{};
+    if(l.deal_type==='Cash / Wholesale'){
+      const cp=document.getElementById('lf-cprice'); if(cp) cp.value=l.contract_price||'';
+      const ap=document.getElementById('lf-aprice'); if(ap) ap.value=l.assigned_price||'';
+    } else if(l.deal_type==='Novation'){
+      const lp=document.getElementById('lf-list-price'); if(lp) lp.value=uw.list_price||l.assigned_price||'';
+      const cn=document.getElementById('lf-contract-nov'); if(cn) cn.value=uw.contract_nov||l.contract_price||'';
+    }
+    setTimeout(calcSpread,50);
   } else {
-    ['lf-name','lf-phone','lf-address','lf-city','lf-zip','lf-cprice','lf-aprice','lf-notes'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('lf-state').value='TX';document.getElementById('lf-followup').value='';document.getElementById('lf-type').value='';document.getElementById('lf-rep').value=STATE.rep||'';updateStatusOpts('');
+    ['lf-name','lf-phone','lf-address','lf-city','lf-zip','lf-notes','lf-followup'].forEach(f=>{const el=document.getElementById(f);if(el)el.value='';});
+    document.getElementById('lf-state').value='TX';
+    document.getElementById('lf-type').value='';
+    document.getElementById('lf-rep').value=STATE.rep||'';
+    document.getElementById('lf-uw').value='';
+    document.getElementById('lf-priority').value='warm';
+    updateStatusOpts('');
+    updateSpreadFields('');
   }
   openOverlay('leadOverlay');
 }
 
 async function saveLead(){
   const name=document.getElementById('lf-name').value.trim();if(!name){toast('Seller name required','err');return}
-  const cp=parseFloat(document.getElementById('lf-cprice').value)||null,ap=parseFloat(document.getElementById('lf-aprice').value)||null;
+  const dealType = document.getElementById('lf-type').value;
+  let contract_price=null, assigned_price=null, assignment_fee=null, uw_data={};
+  if(dealType==='Cash / Wholesale'){
+    contract_price = parseFloat((document.getElementById('lf-cprice')||{}).value)||null;
+    assigned_price = parseFloat((document.getElementById('lf-aprice')||{}).value)||null;
+    assignment_fee = (contract_price&&assigned_price) ? assigned_price-contract_price : null;
+    uw_data = {contract:contract_price, actual_assign:assigned_price};
+  } else if(dealType==='Novation'){
+    const listPrice = parseFloat((document.getElementById('lf-list-price')||{}).value)||null;
+    const contractNov = parseFloat((document.getElementById('lf-contract-nov')||{}).value)||null;
+    const netList = listPrice ? Math.round(listPrice*0.90) : null;
+    assignment_fee = (netList&&contractNov) ? netList-contractNov : null;
+    contract_price = contractNov; assigned_price = listPrice;
+    uw_data = {list_price:listPrice, contract_nov:contractNov, net_list:netList};
+  }
+  const cp=contract_price, ap=assigned_price;
   const status=document.getElementById('lf-status').value;
   let priority=document.getElementById('lf-priority').value;
   const sl=(status||'').toLowerCase();
   if(sl.includes('under contract')||sl.includes('closed')||sl.includes('sold'))priority='contract';
   if(sl.includes('dead'))priority='cold';
-  const rec={name,phone:document.getElementById('lf-phone').value,address:document.getElementById('lf-address').value,city:document.getElementById('lf-city').value,state:document.getElementById('lf-state').value||'TX',zip:document.getElementById('lf-zip').value,deal_type:document.getElementById('lf-type').value,status,priority,category:document.getElementById('lf-cat').value,rep:document.getElementById('lf-rep').value,lead_source:document.getElementById('lf-src').value,follow_up_date:document.getElementById('lf-followup').value||null,contract_price:cp,assigned_price:ap,assignment_fee:cp&&ap?ap-cp:null,underwriting:document.getElementById('lf-uw').value,notes:document.getElementById('lf-notes').value,updated:today()};
+  
+  const rec={name,phone:document.getElementById('lf-phone').value,address:document.getElementById('lf-address').value,city:document.getElementById('lf-city').value,state:document.getElementById('lf-state').value||'TX',zip:document.getElementById('lf-zip').value,deal_type:dealType,status,priority,category:document.getElementById('lf-cat').value,rep:document.getElementById('lf-rep').value,lead_source:document.getElementById('lf-src').value,follow_up_date:document.getElementById('lf-followup').value||null,contract_price:cp,assigned_price:ap,assignment_fee,underwriting:document.getElementById('lf-uw').value,notes:document.getElementById('lf-notes').value,uw_data,updated:today()};
   try{
     if(STATE.editLeadId){await sbUpdate('leads',STATE.editLeadId,rec);const i=DB.leads.findIndex(l=>l.id===STATE.editLeadId);if(i>-1)DB.leads[i]={...DB.leads[i],...rec};}
     else{rec.date_added=today();rec.activity=[];const saved=await sbInsert('leads',rec);if(!supabase){saved.id=uid();DB.leads.unshift(saved);}}
     saveLocal();closeOverlay('leadOverlay');
-    pushActivity('lead', `<strong>${rec.rep||'Team'}</strong> ${STATE.editLeadId?'updated':'added'} <strong>${rec.name}</strong>`, rec.rep);
+    pushActivity('lead','<strong>'+(rec.rep||'Team')+'</strong> '+(STATE.editLeadId?'updated':'added')+' <strong>'+rec.name+'</strong>',rec.rep);
     smartRender('leads');
     toast(STATE.editLeadId?'Lead updated':'Lead added','ok');
   }catch(e){toast('Error saving','err');console.error(e)}
@@ -2591,538 +2842,90 @@ async function deleteCurrentLead(){
   try{await sbDelete('leads',STATE.editLeadId);DB.leads=DB.leads.filter(l=>l.id!==STATE.editLeadId);saveLocal();closeOverlay('leadOverlay');renderPipeline();renderOverview();toast('Lead deleted','ok');}catch(e){toast('Error','err')}
 }
 
-function openTaskModal(leadId,taskId){
-  STATE.editTaskId=taskId||null;
-  document.getElementById('taskModalTitle').textContent=taskId?'Edit Task':'Add Task';
-  document.getElementById('tf-due').value=today();document.getElementById('tf-rep').value=STATE.rep||'';
-  document.getElementById('tf-lead').innerHTML='<option value="">None</option>'+DB.leads.map(l=>`<option value="${l.id}"${l.id===leadId?' selected':''}>${l.name||'?'} — ${l.address||''}</option>`).join('');
-  if(taskId){const t=DB.tasks.find(t=>t.id===taskId);if(!t)return;document.getElementById('tf-title').value=t.title||'';document.getElementById('tf-desc').value=t.description||'';document.getElementById('tf-rep').value=t.rep||'';document.getElementById('tf-priority').value=t.priority||'medium';document.getElementById('tf-due').value=t.due_date||'';document.getElementById('tf-status').value=t.status||'pending';document.getElementById('tf-lead').value=t.lead_id||'';}
-  else{['tf-title','tf-desc'].forEach(f=>document.getElementById(f).value='');document.getElementById('tf-priority').value='high';document.getElementById('tf-status').value='pending';}
-  openOverlay('taskOverlay');
+// ══════════════════════════════════
+// SUPABASE HELPERS
+// ══════════════════════════════════
+async function sbGet(table){
+  if(!supabase)return null;
+  const{data,error}=await supabase.from(table).select('*');
+  if(error){console.error('sbGet',table,error);return null;}
+  return data;
+}
+async function sbInsert(table,rec){
+  if(!supabase)return rec;
+  const{data,error}=await supabase.from(table).insert([rec]).select();
+  if(error)throw error;
+  return data[0];
+}
+async function sbUpdate(table,id,rec){
+  if(!supabase)return;
+  const{error}=await supabase.from(table).update(rec).eq('id',id);
+  if(error)throw error;
+}
+async function sbDelete(table,id){
+  if(!supabase)return;
+  const{error}=await supabase.from(table).delete().eq('id',id);
+  if(error)throw error;
 }
 
-async function saveTask(){
-  const title=document.getElementById('tf-title').value.trim();if(!title){toast('Title required','err');return}
-  const rec={title,description:document.getElementById('tf-desc').value,rep:document.getElementById('tf-rep').value,priority:document.getElementById('tf-priority').value,due_date:document.getElementById('tf-due').value||null,status:document.getElementById('tf-status').value,lead_id:document.getElementById('tf-lead').value||null};
-  try{
-    if(STATE.editTaskId){await sbUpdate('tasks',STATE.editTaskId,rec);const i=DB.tasks.findIndex(t=>t.id===STATE.editTaskId);if(i>-1)DB.tasks[i]={...DB.tasks[i],...rec};}
-    else{rec.created=today();const saved=await sbInsert('tasks',rec);if(!supabase){saved.id=uid();DB.tasks.unshift(saved);}}
-    saveLocal();closeOverlay('taskOverlay');smartRender('tasks');toast(STATE.editTaskId?'Task updated':'Task added','ok');
-  }catch(e){toast('Error','err');console.error(e)}
+// ══════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el)el.classList.add('active');
+  const navSelector = '.nav-item[onclick*="' + page + '"]';
+  const nav = document.querySelector(navSelector);
+  if(nav)nav.classList.add('active');
+  STATE.currentPage=page;
+  if(page==='pipeline')renderPipeline();
+  if(page==='tasks')renderTasksPage();
+  if(page==='sms')renderSMS();
+  if(page==='calls')renderCalls();
+  if(page==='contributions')renderContribs();
+  if(page==='overview')renderOverview();
 }
 
-// ── INSTANT CALL LOG ──
-let LC = { rep: localStorage.getItem('wos_last_rep')||'', pickup:'Yes', conv:'No' };
+function openOverlay(id){const el=document.getElementById(id);if(el){el.style.display='flex';document.body.style.overflow='hidden';}}
+function closeOverlay(id){const el=document.getElementById(id);if(el){el.style.display='none';document.body.style.overflow='';}}
 
-function toggleCallAdvanced() {
-  const el = document.getElementById('callAdvanced');
-  const tog = document.getElementById('callAdvToggle');
-  const open = el.style.display === 'none';
-  el.style.display = open ? 'block' : 'none';
-  tog.textContent = open ? '▲' : '▼';
-}
-
-async function logCallInstant(pickup, conv) {
-  if(!LC.rep) { toast('Tap your name first', 'err'); return; }
-  LC.pickup = pickup;
-  LC.conv = conv;
-  // Visual feedback — briefly highlight the tapped button
-  const date = document.getElementById('lc-date').value || today();
-  const block = document.getElementById('lc-block').value;
-  const day = new Date(date + 'T12:00:00').toLocaleDateString('en-US', {weekday:'long'});
-  const rec = {date, day, time_block: block, rep: LC.rep, picked_up: pickup, conversation: conv};
-  try {
-    const saved = await sbInsert('calls', rec);
-    if(!supabase) { saved.id = uid(); DB.calls.unshift(saved); }
-    saveLocal();
-    closeOverlay('logCallOverlay');
-    const label = conv==='Yes' ? '💬 Conversation logged' : pickup==='Yes' ? '📞 Pickup logged' : '📵 No answer logged';
-    pushActivity('call', '<strong>' + LC.rep + '</strong> — ' + (conv==='Yes'?'had a conversation':pickup==='Yes'?'picked up':'no answer'), LC.rep);
-    smartRender('calls');
-    toast(label + ' · ' + LC.rep, 'ok');
-  } catch(e) { toast('Error saving', 'err'); console.error(e); }
-}
-
-function pickRep(btn) {
-  LC.rep = btn.dataset.rep;
-  localStorage.setItem('wos_last_rep', LC.rep);
-  document.querySelectorAll('.rep-pick-btn').forEach(b=>b.classList.remove('rp-active'));
-  btn.classList.add('rp-active');
-}
-function pickYN(type, val, btn) {
-  if(type==='pickup') {
-    LC.pickup=val;
-    document.getElementById('lc-pu-yes').classList.toggle('yn-active',val==='Yes');
-    document.getElementById('lc-pu-no').classList.toggle('yn-active',val==='No');
-    // auto-set conv to No if no pickup
-    if(val==='No') {
-      LC.conv='No';
-      document.getElementById('lc-cv-yes').classList.remove('yn-active');
-      document.getElementById('lc-cv-no').classList.add('yn-active');
-    }
-  } else {
-    LC.conv=val;
-    document.getElementById('lc-cv-yes').classList.toggle('yn-active',val==='Yes');
-    document.getElementById('lc-cv-no').classList.toggle('yn-active',val==='No');
-  }
-}
-
-function openLogCallModal(){
-  STATE.editCallId = null;
-  document.getElementById('callModalTitle').textContent = '📞 Log a Call';
-  document.getElementById('delCallBtn').style.display = 'none';
-  document.getElementById('lc-date').value = today();
-  // Auto time block
-  const h = new Date().getHours();
-  document.getElementById('lc-block').value = h<12?'Morning':h<17?'Midday':'Evening';
-  // Pre-select last rep
-  document.querySelectorAll('.rep-pick-btn').forEach(b => {
-    b.classList.toggle('rp-active', b.dataset.rep === LC.rep);
-  });
-  // Collapse advanced section
-  const adv = document.getElementById('callAdvanced');
-  if(adv) adv.style.display = 'none';
-  const tog = document.getElementById('callAdvToggle');
-  if(tog) tog.textContent = '▼';
-  LC.pickup='Yes'; LC.conv='No';
-  openOverlay('logCallOverlay');
-}
-
-async function saveCall(){
-  if(!LC.rep){toast('Pick a rep first','err');return}
-  const date=document.getElementById('lc-date').value;
-  if(!date){toast('Date required','err');return}
-  const day=new Date(date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long'});
-  const rec={date,day,time_block:document.getElementById('lc-block').value,rep:LC.rep,picked_up:LC.pickup,conversation:LC.conv};
-  const isEdit = !!STATE.editCallId;
-  try{
-    if(isEdit) {
-      await sbUpdate('calls', STATE.editCallId, rec);
-      const idx = DB.calls.findIndex(r => String(r.id) === String(STATE.editCallId));
-      if(idx > -1) DB.calls[idx] = { ...DB.calls[idx], ...rec };
-      STATE.editCallId = null;
-      toast('Call updated', 'ok');
-    } else {
-      const saved=await sbInsert('calls',rec);
-      if(!supabase){saved.id=uid();DB.calls.unshift(saved);}
-      toast(`${LC.rep} — ${LC.pickup==='Yes'?'Picked up':'No answer'}${LC.conv==='Yes'?' · Conversation':''}`, 'ok');
-    }
-    saveLocal(); closeOverlay('logCallOverlay'); renderCalls(); renderOverview();
-  }catch(e){toast('Error','err');console.error(e)}
-}
-
-
-// ═══════════════════════════════════════════════════
-// EDIT / DELETE — SMS, Calls, Contributions
-// ═══════════════════════════════════════════════════
-
-// ── SMS ──
-function editSMSRow(id) {
-  const r = DB.sms.find(x => String(x.id) === String(id));
-  if(!r) return;
-  STATE.editSMSId = id;
-  document.getElementById('sms-date').value = r.date || '';
-  document.getElementById('sms-inp-rep').value = r.logged_by || '';
-  document.getElementById('sms-inp-texts').value = r.texts_sent || '';
-  document.getElementById('sms-inp-resp').value = r.responses || '';
-  document.getElementById('sms-inp-leads').value = r.leads || '';
-  document.getElementById('sms-inp-offers').value = r.offers || '';
-  document.getElementById('sms-inp-contracts').value = r.contracts || '';
-  document.getElementById('sms-inp-bs').value = r.balance_start || '';
-  document.getElementById('sms-inp-be').value = r.balance_end || '';
-  document.getElementById('smsModalTitle').textContent = 'Edit SMS Entry';
-  document.getElementById('delSMSBtn').style.display = 'inline-flex';
-  openOverlay('smsOverlay');
-}
-
-async function delSMSRow(id) {
-  if(!confirm('Delete this SMS entry?')) return;
-  await sbDelete('sms_daily', id);
-  DB.sms = DB.sms.filter(r => String(r.id) !== String(id));
-  saveLocal(); smartRender('sms');
-  toast('Entry deleted', 'ok');
-}
-
-async function confirmDelSMS() {
-  if(!STATE.editSMSId || !confirm('Delete this SMS entry?')) return;
-  await sbDelete('sms_daily', STATE.editSMSId);
-  DB.sms = DB.sms.filter(r => String(r.id) !== String(STATE.editSMSId));
-  STATE.editSMSId = null;
-  saveLocal(); closeOverlay('smsOverlay'); renderSMS(); renderOverview();
-  toast('Entry deleted', 'ok');
-}
-
-// ── CALLS ──
-function editCallRow(id) {
-  const r = DB.calls.find(x => String(x.id) === String(id));
-  if(!r) return;
-  STATE.editCallId = id;
-  // Pre-fill the call log modal
-  LC.rep = r.rep || '';
-  LC.pickup = r.picked_up || 'Yes';
-  LC.conv = r.conversation || 'No';
-  document.getElementById('lc-date').value = r.date || '';
-  document.getElementById('lc-block').value = r.time_block || 'Evening';
-  // Update button states
-  document.querySelectorAll('.rep-pick-btn').forEach(b => b.classList.toggle('rp-active', b.dataset.rep === LC.rep));
-  document.getElementById('lc-pu-yes').classList.toggle('yn-active', LC.pickup === 'Yes');
-  document.getElementById('lc-pu-no').classList.toggle('yn-active', LC.pickup === 'No');
-  document.getElementById('lc-cv-yes').classList.toggle('yn-active', LC.conv === 'Yes');
-  document.getElementById('lc-cv-no').classList.toggle('yn-active', LC.conv === 'No');
-  document.getElementById('callModalTitle').textContent = 'Edit Call Entry';
-  document.getElementById('delCallBtn').style.display = 'inline-flex';
-  openOverlay('logCallOverlay');
-}
-
-async function delCallRow(id) {
-  if(!confirm('Delete this call entry?')) return;
-  await sbDelete('calls', id);
-  DB.calls = DB.calls.filter(r => String(r.id) !== String(id));
-  saveLocal(); smartRender('calls');
-  toast('Call deleted', 'ok');
-}
-
-async function confirmDelCall() {
-  if(!STATE.editCallId || !confirm('Delete this call?')) return;
-  await sbDelete('calls', STATE.editCallId);
-  DB.calls = DB.calls.filter(r => String(r.id) !== String(STATE.editCallId));
-  STATE.editCallId = null;
-  saveLocal(); closeOverlay('logCallOverlay'); renderCalls(); renderOverview();
-  toast('Call deleted', 'ok');
-}
-
-// ── CONTRIBUTIONS ──
-function editContribRow(id) {
-  const c = DB.contributions.find(x => String(x.id) === String(id));
-  if(!c) return;
-  STATE.editContribId = id;
-  document.getElementById('c-month').value = c.month || '';
-  document.getElementById('c-ivan').value = c.ivan || '';
-  document.getElementById('c-uriel').value = c.uriel || '';
-  document.getElementById('c-alan').value = c.alan || '';
-  document.getElementById('c-dustin').value = c.dustin || '';
-  document.getElementById('contribModalTitle').textContent = 'Edit Contributions';
-  document.getElementById('delContribBtn').style.display = 'inline-flex';
-  openOverlay('contribOverlay');
-}
-
-async function delContribRow(id) {
-  if(!confirm('Delete this contribution entry?')) return;
-  await sbDelete('contributions', id);
-  DB.contributions = DB.contributions.filter(c => String(c.id) !== String(id));
-  saveLocal(); renderContribs();
-  toast('Entry deleted', 'ok');
-}
-
-async function confirmDelContrib() {
-  if(!STATE.editContribId || !confirm('Delete this entry?')) return;
-  await sbDelete('contributions', STATE.editContribId);
-  DB.contributions = DB.contributions.filter(c => String(c.id) !== String(STATE.editContribId));
-  STATE.editContribId = null;
-  saveLocal(); closeOverlay('contribOverlay'); renderContribs();
-  toast('Entry deleted', 'ok');
-}
-
-function openSMSModal(){
-  STATE.editSMSId = null;
-  document.getElementById('smsModalTitle').textContent = 'Log SMS Day';
-  document.getElementById('delSMSBtn').style.display = 'none';
-  document.getElementById('sms-date').value=today();
-  if(STATE.rep) document.getElementById('sms-inp-rep').value=STATE.rep;
-  ['sms-inp-texts','sms-inp-resp','sms-inp-leads','sms-inp-offers','sms-inp-contracts','sms-inp-bs','sms-inp-be'].forEach(f=>document.getElementById(f).value='');
-  openOverlay('smsOverlay');
-}
-async function saveSMS(){
-  const date=document.getElementById('sms-date').value;if(!date){toast('Date required','err');return}
-  const isEdit = !!STATE.editSMSId;
-  const rec={
-    date,
-    logged_by:document.getElementById('sms-inp-rep').value||'',
-    texts_sent:parseInt(document.getElementById('sms-inp-texts').value)||0,
-    responses:parseInt(document.getElementById('sms-inp-resp').value)||0,
-    leads:parseInt(document.getElementById('sms-inp-leads').value)||0,
-    offers:parseInt(document.getElementById('sms-inp-offers').value)||0,
-    contracts:parseInt(document.getElementById('sms-inp-contracts').value)||0,
-    balance_start:parseFloat(document.getElementById('sms-inp-bs').value)||0,
-    balance_end:parseFloat(document.getElementById('sms-inp-be').value)||0
-  };
-  try{
-    if(isEdit) {
-      await sbUpdate('sms_daily', STATE.editSMSId, rec);
-      const idx = DB.sms.findIndex(r => String(r.id) === String(STATE.editSMSId));
-      if(idx > -1) DB.sms[idx] = { ...DB.sms[idx], ...rec };
-      STATE.editSMSId = null;
-      toast('Entry updated', 'ok');
-    } else {
-      const saved=await sbInsert('sms_daily',rec);
-      if(!supabase){saved.id=uid();DB.sms.unshift(saved);}
-      toast('SMS day logged','ok');
-    }
-    saveLocal(); closeOverlay('smsOverlay');
-    STATE.smsView='daily'; STATE.smsYear=date.slice(0,4); STATE.smsMonth=getMonth(date);
-    const repName = rec.logged_by || 'Team';
-    pushActivity('sms', `<strong>${repName}</strong> logged ${rec.texts_sent?.toLocaleString()||0} texts · ${rec.leads||0} leads · ${rec.offers||0} offers`, repName);
-    smartRender('sms');
-  }catch(e){toast('Error saving','err');console.error(e)}
-}
-
-function openContribModal(){
-  STATE.editContribId = null;
-  document.getElementById('contribModalTitle').textContent = 'Log Monthly Contributions';
-  document.getElementById('delContribBtn').style.display = 'none';
-  document.getElementById('c-month').value=thisMonth();
-  ['c-ivan','c-uriel','c-alan','c-dustin'].forEach(f=>document.getElementById(f).value='');
-  openOverlay('contribOverlay');
-}
-async function saveContrib(){
-  const month=document.getElementById('c-month').value;if(!month){toast('Month required','err');return}
-  const rec={month,ivan:parseFloat(document.getElementById('c-ivan').value)||0,uriel:parseFloat(document.getElementById('c-uriel').value)||0,alan:parseFloat(document.getElementById('c-alan').value)||0,dustin:parseFloat(document.getElementById('c-dustin').value)||0};
-  const isEdit = !!STATE.editContribId;
-  try{
-    if(isEdit) {
-      await sbUpdate('contributions', STATE.editContribId, rec);
-      const idx = DB.contributions.findIndex(c => String(c.id) === String(STATE.editContribId));
-      if(idx > -1) DB.contributions[idx] = { ...DB.contributions[idx], ...rec };
-      STATE.editContribId = null;
-      toast('Contributions updated','ok');
-    } else {
-      const saved=await sbInsert('contributions',rec);
-      if(!supabase){saved.id=uid();DB.contributions.unshift(saved);}
-      toast('Contributions saved','ok');
-    }
-    saveLocal(); closeOverlay('contribOverlay'); smartRender('contributions');
-  }catch(e){toast('Error','err');console.error(e)}
-}
-
-// ═══════════════════════════════════════════════════
-// OVERLAYS
-// ═══════════════════════════════════════════════════
-function openOverlay(id){document.getElementById(id).classList.add('open')}
-function closeOverlay(id){document.getElementById(id).classList.remove('open')}
-document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
-document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.overlay.open').forEach(o=>o.classList.remove('open'))});
-
-// ═══════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════
-function toast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className=`show ${type}`;clearTimeout(el._t);el._t=setTimeout(()=>el.className='',2800)}
-
-// ═══════════════════════════════════════════════════
-// SEED DATA (offline demo)
-// ═══════════════════════════════════════════════════
-function seedIfEmpty(){
-  if(DB.leads.length>0||DB.sms.length>0)return;
-
-  DB.leads=[
-    {id:'l1',name:'Andrew (Wholesaler)',phone:'210-854-3464',address:'11010 Stagwood Pass',city:'San Antonio',state:'TX',zip:'78245',deal_type:'Novation',status:'Novation — Under Contract',priority:'contract',category:'JV / Wholesaler',rep:'Ivan',lead_source:'JV',follow_up_date:null,contract_price:150000,assigned_price:200000,assignment_fee:50000,underwriting:'Complete',notes:'Andrew is pitching novation. Knows seller in person — good chance we close at 170–180k.',date_added:'2026-04-04',updated:'2026-04-04',activity:[{text:'JV lead added. Andrew in contact with seller.',time:'Apr 4',rep:'Ivan'}]},
-    {id:'l2',name:'Gregory Driffin & Mia Taylor',phone:'832-971-2876',address:'2330 Marble Falls',city:'Spring',state:'TX',zip:'77379',deal_type:'Subject-To',status:'Sub-To — Structuring Terms',priority:'hot',category:'Motivated Seller',rep:'Alan',lead_source:'SMS',follow_up_date:'2026-04-07',contract_price:null,assigned_price:null,assignment_fee:null,underwriting:'Pending',notes:"Alan pitching Sub-to/deed+trust+leaseback. Seller's wife has dementia — needs to stay in home. Very sensitive deal.",date_added:'2026-03-26',updated:'2026-04-03',activity:[{text:'SMS outbound contact.',time:'Mar 26',rep:'Ivan'},{text:'Alan pitched Sub-to structure.',time:'Mar 28',rep:'Alan'}]},
-    {id:'l3',name:'Marium & Katy (Louis)',phone:'281-605-0164',address:'1915 Marlberry Ln',city:'Houston',state:'TX',zip:'77084',deal_type:'Novation',status:'Novation — Need Underwriting',priority:'warm',category:'Motivated Seller',rep:'Alan',lead_source:'SMS',follow_up_date:'2026-04-08',contract_price:193000,assigned_price:240000,assignment_fee:8000,underwriting:'Pending',notes:'Offer declined temporarily. Need exact rehab costs to make a sound offer.',date_added:'2026-03-27',updated:'2026-04-01',activity:[{text:'Offer at $193k submitted.',time:'Mar 27',rep:'Alan'},{text:'Offer declined — following up.',time:'Mar 30',rep:'Alan'}]},
-    {id:'l4',name:'Gabriel Rios',phone:'214-470-0838',address:'6514 American Way',city:'Dallas',state:'TX',zip:'75217',deal_type:'Novation',status:'Novation — Initial Contact',priority:'nurture',category:'Motivated Seller',rep:'Ivan',lead_source:'SMS',follow_up_date:'2026-04-10',contract_price:null,assigned_price:null,assignment_fee:null,underwriting:'Not started',notes:"Parents not ready under $200k. Nurture sequence — likely 30–60 days out.",date_added:'2026-03-27',updated:'2026-03-30',activity:[{text:'Outbound SMS.',time:'Mar 27',rep:'Ivan'},{text:'Declined. Put in nurture.',time:'Mar 30',rep:'Ivan'}]},
-    {id:'l5',name:'Stephen Salazar',phone:'210-788-5162',address:'422 Bertetti Drive',city:'San Antonio',state:'TX',zip:'78227',deal_type:'Novation',status:'Novation — Need Underwriting',priority:'hot',category:'Motivated Seller',rep:'Dustin',lead_source:'SMS',follow_up_date:'2026-04-05',contract_price:140000,assigned_price:161000,assignment_fee:21000,underwriting:'In Review',notes:'Interested. Dustin walking property 4/5/26. Going intermittently MIA — needs consistent follow-up.',date_added:'2026-03-20',updated:'2026-04-03',activity:[{text:'Initial SMS.',time:'Mar 20',rep:'Ivan'},{text:'Seller expressed interest.',time:'Mar 25',rep:'Dustin'},{text:'Walk scheduled 4/5.',time:'Apr 3',rep:'Dustin'}]},
-    {id:'l6',name:'Donald & Diane Pagel',phone:'208-599-0361',address:'5358 Peppermint Drive',city:'San Antonio',state:'TX',zip:'78240',deal_type:'Novation',status:'Novation — Initial Contact',priority:'mia',category:'Motivated Seller',rep:'Dustin',lead_source:'SMS',follow_up_date:'2026-04-10',contract_price:160000,assigned_price:null,assignment_fee:null,underwriting:'Not started',notes:'Interested then went MIA. Need consistent touchpoints.',date_added:'2026-03-20',updated:'2026-03-30',activity:[{text:'Contact made.',time:'Mar 20',rep:'Ivan'},{text:'Went MIA after initial interest.',time:'Mar 30',rep:'Dustin'}]},
-    {id:'l7',name:'Katherine Cuervo',phone:'210-400-9604',address:'24 Bratton Drive',city:'San Antonio',state:'TX',zip:'78253',deal_type:'Novation',status:'Novation — Awaiting Seller Signature',priority:'contract',category:'Motivated Seller',rep:'Ivan',lead_source:'SMS',follow_up_date:'2026-04-08',contract_price:120000,assigned_price:145000,assignment_fee:8000,underwriting:'Complete',notes:'Agreements sent 4/01. Awaiting signature. Re-negotiate price for townhome.',date_added:'2026-03-28',updated:'2026-04-01',activity:[{text:'Offer accepted.',time:'Mar 28',rep:'Ivan'},{text:'Novation agreements sent.',time:'Apr 1',rep:'Ivan'}]},
-    {id:'l8',name:'Ladji Diomande',phone:'713-628-0730',address:'326 Remington Ridge Drive',city:'Houston',state:'TX',zip:'77073',deal_type:'Novation',status:'Novation — Need Underwriting',priority:'warm',category:'Motivated Seller',rep:'Alan',lead_source:'SMS',follow_up_date:'2026-04-08',contract_price:190000,assigned_price:230000,assignment_fee:8000,underwriting:'Pending',notes:'Walking property 4/4 at 10AM. High potential if ARV confirms.',date_added:'2026-03-30',updated:'2026-04-04',activity:[{text:'Initial SMS.',time:'Mar 30',rep:'Ivan'},{text:'Walk set for 4/4 at 10AM.',time:'Apr 3',rep:'Alan'}]},
-  ];
-
-  DB.tasks=[
-    {id:'t1',title:'Walk Salazar property',description:'Dustin to walk 422 Bertetti Dr and report on condition/repairs.',rep:'Dustin',priority:'critical',due_date:'2026-04-05',status:'pending',lead_id:'l5',created:'2026-04-04'},
-    {id:'t2',title:'Follow up — Pagel (MIA)',description:"Donald & Diane gone dark. Try calling at different times.",rep:'Dustin',priority:'high',due_date:'2026-04-06',status:'pending',lead_id:'l6',created:'2026-04-04'},
-    {id:'t3',title:'Get Cuervo docs signed',description:'Agreements sent. Need signature ASAP to close.',rep:'Ivan',priority:'critical',due_date:'2026-04-07',status:'pending',lead_id:'l7',created:'2026-04-04'},
-    {id:'t4',title:'Underwriting — Marlberry Ln',description:'Pull comps and run full underwriting for Marium & Katy.',rep:'Alan',priority:'high',due_date:'2026-04-08',status:'pending',lead_id:'l3',created:'2026-04-04'},
-    {id:'t5',title:'Re-engage Gabriel Rios',description:'In nurture. Send value-add text to re-spark interest.',rep:'Ivan',priority:'medium',due_date:'2026-04-10',status:'pending',lead_id:'l4',created:'2026-04-04'},
-  ];
-
-  DB.sms=[
-    {id:'s1',date:'2026-02-27',texts_sent:1125,responses:137,leads:6,offers:0,contracts:0,balance_start:595,balance_end:573},
-    {id:'s2',date:'2026-03-02',texts_sent:2730,responses:272,leads:11,offers:0,contracts:0,balance_start:572,balance_end:539},
-    {id:'s3',date:'2026-03-05',texts_sent:2648,responses:232,leads:10,offers:1,contracts:0,balance_start:472,balance_end:446},
-    {id:'s4',date:'2026-03-10',texts_sent:2043,responses:174,leads:11,offers:3,contracts:0,balance_start:387,balance_end:362},
-    {id:'s5',date:'2026-03-17',texts_sent:2371,responses:339,leads:12,offers:0,contracts:0,balance_start:333,balance_end:304},
-    {id:'s6',date:'2026-03-18',texts_sent:4183,responses:509,leads:15,offers:1,contracts:0,balance_start:304,balance_end:252},
-    {id:'s7',date:'2026-03-23',texts_sent:3934,responses:482,leads:22,offers:0,contracts:0,balance_start:352,balance_end:304},
-    {id:'s8',date:'2026-03-27',texts_sent:3491,responses:477,leads:14,offers:5,contracts:1,balance_start:486,balance_end:446},
-    {id:'s9',date:'2026-03-30',texts_sent:3406,responses:426,leads:16,offers:1,contracts:0,balance_start:396,balance_end:341},
-    {id:'s10',date:'2026-04-01',texts_sent:2136,responses:191,leads:10,offers:1,contracts:0,balance_start:294,balance_end:261},
-    {id:'s11',date:'2026-04-02',texts_sent:2189,responses:208,leads:9,offers:0,contracts:0,balance_start:261,balance_end:224},
-    {id:'s12',date:'2026-04-03',texts_sent:2222,responses:170,leads:6,offers:0,contracts:0,balance_start:224,balance_end:191},
-  ];
-
-  DB.calls=[
-    {id:'c1',date:'2026-03-23',day:'Monday',time_block:'Evening',rep:'Ivan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c2',date:'2026-03-23',day:'Monday',time_block:'Evening',rep:'Dustin',picked_up:'Yes',conversation:'No'},
-    {id:'c3',date:'2026-03-23',day:'Monday',time_block:'Evening',rep:'Ivan',picked_up:'No',conversation:'No'},
-    {id:'c4',date:'2026-03-24',day:'Tuesday',time_block:'Evening',rep:'Ivan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c5',date:'2026-03-25',day:'Wednesday',time_block:'Evening',rep:'Ivan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c6',date:'2026-03-25',day:'Wednesday',time_block:'Evening',rep:'Dustin',picked_up:'No',conversation:'No'},
-    {id:'c7',date:'2026-03-26',day:'Thursday',time_block:'Evening',rep:'Alan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c8',date:'2026-03-26',day:'Thursday',time_block:'Evening',rep:'Ivan',picked_up:'No',conversation:'No'},
-    {id:'c9',date:'2026-03-27',day:'Friday',time_block:'Evening',rep:'Ivan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c10',date:'2026-03-27',day:'Friday',time_block:'Evening',rep:'Alan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c11',date:'2026-04-01',day:'Wednesday',time_block:'Midday',rep:'Alan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c12',date:'2026-04-02',day:'Thursday',time_block:'Evening',rep:'Ivan',picked_up:'Yes',conversation:'Yes'},
-    {id:'c13',date:'2026-04-02',day:'Thursday',time_block:'Evening',rep:'Ivan',picked_up:'No',conversation:'No'},
-    {id:'c14',date:'2026-04-03',day:'Friday',time_block:'Evening',rep:'Ivan',picked_up:'Yes',conversation:'No'},
-    {id:'c15',date:'2026-04-03',day:'Friday',time_block:'Evening',rep:'Ivan',picked_up:'No',conversation:'No'},
-  ];
-
-  DB.contributions=[{id:'k1',month:'2026-03',ivan:351,uriel:659,alan:351,dustin:515}];
-  saveLocal();
-}
-
-// ═══════════════════════════════════════════════════
-// BIBLE VERSES — Humility, Diligence, Doing Right
-// ═══════════════════════════════════════════════════
-const VERSES = [
-  // Diligence
-  { text: "Whatever you do, work at it with all your heart, as working for the Lord, not for human masters.", ref: "Colossians 3:23 (NIV)" },
-  { text: "Do you see someone skilled in their work? They will serve before kings; they will not serve before officials of low rank.", ref: "Proverbs 22:29 (NIV)" },
-  { text: "The plans of the diligent lead to profit as surely as haste leads to poverty.", ref: "Proverbs 21:5 (NIV)" },
-  { text: "Commit to the Lord whatever you do, and he will establish your plans.", ref: "Proverbs 16:3 (NIV)" },
-  { text: "All hard work brings a profit, but mere talk leads only to poverty.", ref: "Proverbs 14:23 (NIV)" },
-  { text: "Never be lacking in zeal, but keep your spiritual fervor, serving the Lord.", ref: "Romans 12:11 (NIV)" },
-  { text: "The craving of a sluggard will be the death of him, because his hands refuse to work. All day long he craves for more, but the righteous give without sparing.", ref: "Proverbs 21:25-26 (NIV)" },
-  { text: "For we are God's handiwork, created in Christ Jesus to do good works, which God prepared in advance for us to do.", ref: "Ephesians 2:10 (NIV)" },
-  { text: "She sets about her work vigorously; her arms are strong for her tasks.", ref: "Proverbs 31:17 (NIV)" },
-  { text: "Whatever your hand finds to do, do it with all your might.", ref: "Ecclesiastes 9:10 (NIV)" },
-  { text: "In all the work you are doing, work the best you can. Work as if you were doing it for the Lord, not for people.", ref: "Colossians 3:23 (NCV)" },
-  { text: "The hand of the diligent will rule, while the slothful will be put to forced labor.", ref: "Proverbs 12:24 (ESV)" },
-  { text: "A sluggard's appetite is never filled, but the desires of the diligent are fully satisfied.", ref: "Proverbs 13:4 (NIV)" },
-  { text: "Go to the ant, you sluggard; consider its ways and be wise! It has no commander, no overseer or ruler, yet it stores its provisions in summer and gathers its food at harvest.", ref: "Proverbs 6:6-8 (NIV)" },
-  { text: "Lazy hands make for poverty, but diligent hands bring wealth.", ref: "Proverbs 10:4 (NIV)" },
-  { text: "Do not grow weary in doing good, for at the proper time we will reap a harvest if we do not give up.", ref: "Galatians 6:9 (NIV)" },
-  // Humility
-  { text: "Humble yourselves before the Lord, and he will lift you up.", ref: "James 4:10 (NIV)" },
-  { text: "Do nothing out of selfish ambition or vain conceit. Rather, in humility value others above yourselves.", ref: "Philippians 2:3 (NIV)" },
-  { text: "Pride goes before destruction, a haughty spirit before a fall.", ref: "Proverbs 16:18 (NIV)" },
-  { text: "Humility is the fear of the Lord; its wages are riches and honor and life.", ref: "Proverbs 22:4 (NIV)" },
-  { text: "For all those who exalt themselves will be humbled, and those who humble themselves will be exalted.", ref: "Luke 14:11 (NIV)" },
-  { text: "He has shown you, O mortal, what is good. And what does the Lord require of you? To act justly and to love mercy and to walk humbly with your God.", ref: "Micah 6:8 (NIV)" },
-  { text: "When pride comes, then comes disgrace, but with humility comes wisdom.", ref: "Proverbs 11:2 (NIV)" },
-  { text: "All of you, clothe yourselves with humility toward one another, because God opposes the proud but shows favor to the humble.", ref: "1 Peter 5:5 (NIV)" },
-  { text: "The Lord sustains the humble but casts the wicked to the ground.", ref: "Psalm 147:6 (NIV)" },
-  { text: "Before a downfall the heart is haughty, but humility comes before honor.", ref: "Proverbs 18:12 (NIV)" },
-  { text: "Blessed are the meek, for they will inherit the earth.", ref: "Matthew 5:5 (NIV)" },
-  // Doing Right & Integrity
-  { text: "Do not be overcome by evil, but overcome evil with good.", ref: "Romans 12:21 (NIV)" },
-  { text: "The righteous person may have many troubles, but the Lord delivers him from them all.", ref: "Psalm 34:19 (NIV)" },
-  { text: "Whoever walks in integrity walks securely, but whoever takes crooked paths will be found out.", ref: "Proverbs 10:9 (NIV)" },
-  { text: "In the same way, let your light shine before others, that they may see your good deeds and glorify your Father in heaven.", ref: "Matthew 5:16 (NIV)" },
-  { text: "Trust in the Lord with all your heart and lean not on your own understanding; in all your ways submit to him, and he will make your paths straight.", ref: "Proverbs 3:5-6 (NIV)" },
-  { text: "Be strong and courageous. Do not be afraid; do not be discouraged, for the Lord your God will be with you wherever you go.", ref: "Joshua 1:9 (NIV)" },
-  { text: "I can do all this through him who gives me strength.", ref: "Philippians 4:13 (NIV)" },
-  { text: "For I know the plans I have for you, declares the Lord, plans to prosper you and not to harm you, plans to give you hope and a future.", ref: "Jeremiah 29:11 (NIV)" },
-  { text: "Seek first his kingdom and his righteousness, and all these things will be given to you as well.", ref: "Matthew 6:33 (NIV)" },
-  { text: "A good name is more desirable than great riches; to be esteemed is better than silver or gold.", ref: "Proverbs 22:1 (NIV)" },
-  { text: "And God is able to bless you abundantly, so that in all things at all times, having all that you need, you will abound in every good work.", ref: "2 Corinthians 9:8 (NIV)" },
-  { text: "The Lord detests dishonest scales, but accurate weights find favor with him.", ref: "Proverbs 11:1 (NIV)" },
-  { text: "So in everything, do to others what you would have them do to you, for this sums up the Law and the Prophets.", ref: "Matthew 7:12 (NIV)" },
-  { text: "The integrity of the upright guides them, but the unfaithful are destroyed by their duplicity.", ref: "Proverbs 11:3 (NIV)" },
-  { text: "Righteousness exalts a nation, but sin condemns any people.", ref: "Proverbs 14:34 (NIV)" },
-  { text: "Better a little with righteousness than much gain with injustice.", ref: "Proverbs 16:8 (NIV)" },
-  { text: "The Lord rewards everyone for their righteousness and faithfulness.", ref: "1 Samuel 26:23 (NIV)" },
-  { text: "Blessed are those who hunger and thirst for righteousness, for they will be filled.", ref: "Matthew 5:6 (NIV)" },
-  { text: "Start children off on the way they should go, and even when they are old they will not turn from it.", ref: "Proverbs 22:6 (NIV)" },
-  { text: "The Lord is my shepherd, I lack nothing.", ref: "Psalm 23:1 (NIV)" },
-  { text: "For the Lord God is a sun and shield; the Lord bestows favor and honor; no good thing does he withhold from those whose walk is blameless.", ref: "Psalm 84:11 (NIV)" },
-  { text: "Commit your way to the Lord; trust in him and he will do this: He will make your righteous reward shine like the dawn, your vindication like the noonday sun.", ref: "Psalm 37:5-6 (NIV)" },
-  { text: "No discipline seems pleasant at the time, but painful. Later on, however, it produces a harvest of righteousness and peace for those who have been trained by it.", ref: "Hebrews 12:11 (NIV)" },
-];
-
-function showDailyVerse() {
-  const el = document.getElementById('verseText');
-  const refEl = document.getElementById('verseRef');
-  if(!el || !refEl) return;
-  // Use the day of year as seed so it's consistent all day but changes daily
-  const now = new Date();
-  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
-  const verse = VERSES[dayOfYear % VERSES.length];
-  // Fade in
-  el.style.opacity = '0';
-  refEl.style.opacity = '0';
-  el.textContent = '"' + verse.text + '"';
-  refEl.textContent = '— ' + verse.ref;
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      el.style.transition = 'opacity 0.8s ease';
-      refEl.style.transition = 'opacity 0.8s ease 0.3s';
-      el.style.opacity = '1';
-      refEl.style.opacity = '1';
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════════
-// ANIMATIONS
-// ═══════════════════════════════════════════════════
-
-function animateCount(id, target, useLocale) {
-  const el = document.getElementById(id);
-  if(!el) return;
-  const start = 0;
-  const duration = 900;
-  const startTime = performance.now();
-  el.classList.add('counting');
-
-  function update(now) {
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    // Ease out cubic
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = Math.round(start + (target - start) * eased);
-    el.textContent = useLocale ? current.toLocaleString() : current;
-    if(progress < 1) requestAnimationFrame(update);
-    else el.textContent = useLocale ? target.toLocaleString() : target;
-  }
-  requestAnimationFrame(update);
-}
-
-function drawRing(containerId, pct, color, size=52) {
-  const el = document.getElementById(containerId);
-  if(!el) return;
-  const r = (size - 6) / 2;
-  const circ = 2 * Math.PI * r;
-  const offset = circ - (Math.min(pct, 100) / 100) * circ;
-  const cx = size / 2;
-  el.innerHTML = `
-    <div class="ring-wrap" style="width:${size}px;height:${size}px">
-      <svg class="ring-svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
-        <circle class="ring-track" cx="${cx}" cy="${cx}" r="${r}"/>
-        <circle class="ring-fill" cx="${cx}" cy="${cx}" r="${r}"
-          stroke="${color}"
-          stroke-dasharray="${circ}"
-          stroke-dashoffset="${circ}"
-          style="transition:stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)"
-          id="${containerId}-circle"/>
-      </svg>
-    </div>`;
-  // Trigger animation after paint
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const circle = document.getElementById(containerId + '-circle');
-      if(circle) circle.style.strokeDashoffset = offset;
-    });
-  });
-}
-
-// ═══════════════════════════════════════════════════
+// ══════════════════════════════════
 // INIT
-// ═══════════════════════════════════════════════════
+// ══════════════════════════════════
 async function init(){
-  loadLocal();
-  seedIfEmpty();
+  // Load config
+  if(typeof SUPABASE_URL!=='undefined'&&SUPABASE_URL&&!SUPABASE_URL.includes('YOUR_')){
+    try{
+      supabase=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+      if(supabase){
+        document.getElementById('configBanner').style.display='none';
+        supabase.channel('wos').
+          on('postgres_changes',{event:'*',schema:'public',table:'calls'},()=>loadCalls()).
+          on('postgres_changes',{event:'*',schema:'public',table:'sms_daily'},()=>loadSMS()).
+          on('postgres_changes',{event:'*',schema:'public',table:'deals'},()=>loadDeals()).
+          on('postgres_changes',{event:'*',schema:'public',table:'contributions'},()=>loadContribs()).
+          on('postgres_changes',{event:'*',schema:'public',table:'leads'},()=>loadLeads()).
+          on('postgres_changes',{event:'*',schema:'public',table:'tasks'},()=>loadTasks()).
+          subscribe();
+      }
+    }catch(e){console.error('Supabase init error',e);}
+  }
+  // Load from localStorage
+  const saved=localStorage.getItem('wos_db');
+  if(saved){try{const d=JSON.parse(saved);DB.leads=d.leads||[];DB.calls=d.calls||[];DB.sms=d.sms||[];DB.tasks=d.tasks||[];DB.contributions=d.contributions||[];DB.deals=d.deals||[];}catch(e){}}
   // rep selector removed — each modal handles its own rep
   // Restore sidebar rep selection
-  const savedRep = localStorage.getItem('wos_rep') || localStorage.getItem('wos_last_rep') || '';
-  if(savedRep) {
-    STATE.rep = savedRep;
-    LC.rep = savedRep;
-    document.querySelectorAll('.sidebar-rep-btn').forEach(b => b.classList.toggle('srep-active', b.dataset.rep === savedRep));
-  }
-  const connected=await initSB();
-  if(connected)await loadAll();
-  renderOverview();
+  const savedRep=localStorage.getItem('wos_rep')||localStorage.getItem('wos_last_rep')||'';
+  if(savedRep){STATE.rep=savedRep;LC.rep=savedRep;document.querySelectorAll('.sidebar-rep-btn').forEach(b=>b.classList.toggle('srep-active',b.dataset.rep===savedRep));}
+  showPage('overview');
+  restoreRepFilters();
+  await loadAll();
+  document.getElementById('dashDate').textContent=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
 }
-init();
+
+document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
