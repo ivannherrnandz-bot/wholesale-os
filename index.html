@@ -1973,7 +1973,10 @@ function renderTaskCard(t){
   return`<div class="task-card tc-${t.priority} ${od?'tc-overdue':''} ${t.status==='completed'?'tc-done':''}" onclick="openTaskModal('${t.lead_id||''}','${t.id}')">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:7px;margin-bottom:5px">
       <div class="task-title">${t.title}</div>
-      <button class="btn btn-xs btn-ghost" style="flex-shrink:0" onclick="event.stopPropagation();toggleTask('${t.id}')">${t.status==='completed'?'↩':'✓'}</button>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="btn btn-xs btn-ghost" onclick="event.stopPropagation();toggleTask('${t.id}')" title="${t.status==='completed'?'Reopen':'Mark done'}">${t.status==='completed'?'↩':'✓'}</button>
+        <button class="btn btn-xs btn-ghost" style="color:var(--red);opacity:0.6" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0.6" onclick="event.stopPropagation();deleteTask('${t.id}')" title="Delete task">×</button>
+      </div>
     </div>
     ${t.description?`<div class="task-body">${t.description.slice(0,80)}${t.description.length>80?'…':''}</div>`:''}
     <div class="task-meta">
@@ -2005,6 +2008,16 @@ async function toggleTask(id){
   renderTasksPage();
   renderOverview();
   toast(t.status==='completed'?'Task completed':'Task reopened','ok');
+}
+
+async function deleteTask(id){
+  if(!confirm('Delete this task? This cannot be undone.')) return;
+  try { await sbDelete('tasks', id); } catch(e) {}
+  DB.tasks = DB.tasks.filter(t => t.id !== id);
+  saveLocal();
+  renderTasksPage();
+  renderOverview();
+  toast('Task deleted','ok');
 }
 
 // ═══════════════════════════════════════════════════
